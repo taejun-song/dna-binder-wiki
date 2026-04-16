@@ -87,7 +87,7 @@ def create_rfd3_config(
     contig = f"A1-{dna_len},/0,B1-{dna_len},/0,{protein_length}"
     config = {
         name: {
-            "input": str(dna_pdb),
+            "input": str(Path(dna_pdb).resolve()),
             "contig": contig,
             "length": protein_length,
             "is_non_loopy": True,
