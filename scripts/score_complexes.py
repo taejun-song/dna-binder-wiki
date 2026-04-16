@@ -63,6 +63,7 @@ def main():
     parser.add_argument("--binder-csv", help="CSV with binder sequences (amino acid sequence column)")
     parser.add_argument("--binder-dir", help="Directory of binder PDB files")
     parser.add_argument("--dna-sequence", required=True, help="Target DNA sequence")
+    parser.add_argument("--target-filter", help="Only include rows where on_target_seq matches this value")
     parser.add_argument("--output", required=True, help="Output TSV path")
     parser.add_argument("--rf3-output-dir", default="/tmp/rf3_scoring", help="RF3 working directory")
     args = parser.parse_args()
@@ -76,6 +77,9 @@ def main():
     if args.binder_csv:
         import pandas as pd
         df = pd.read_csv(args.binder_csv)
+        if args.target_filter and "on_target_seq" in df.columns:
+            df = df[df["on_target_seq"] == args.target_filter]
+            print(f"Filtered to {len(df)} rows matching target {args.target_filter}", file=sys.stderr)
         for _, row in df.iterrows():
             candidates.append({
                 "name": row.get("shorthand_name", row.get("design_name", f"design_{_}")),
