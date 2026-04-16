@@ -64,8 +64,9 @@ def main():
     with open(config_path, "w") as f:
         json.dump(config, f, indent=2)
 
+    rfd3_bin = str(Path(sys.executable).parent / "rfd3")
     cmd = [
-        "rfd3",
+        rfd3_bin,
         f"out_dir={output_dir}",
         f"inputs={config_path}",
         f"inference.num_designs={args.num_designs}",

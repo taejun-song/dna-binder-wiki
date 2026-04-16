@@ -105,7 +105,8 @@ def main():
     with open(input_path, "w") as f:
         json.dump(rf3_inputs, f, indent=2)
 
-    cmd = ["rf3", "fold", f"inputs={input_path}", f"out_dir={rf3_dir}/results"]
+    rf3_bin = str(Path(sys.executable).parent / "rf3")
+    cmd = [rf3_bin, "fold", f"inputs={input_path}", f"out_dir={rf3_dir}/results"]
     print(f"Running: {' '.join(cmd)}", file=sys.stderr)
     result = subprocess.run(cmd, capture_output=False)
 
