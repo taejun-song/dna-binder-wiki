@@ -128,7 +128,7 @@ def run_rfd3_for_target(
         rfd3_bin,
         f"out_dir={rfd3_out}",
         f"inputs={config_path}",
-        f"+inference.num_designs={num_designs}",
+        f"n_batches={num_designs}",
         f"ckpt_path={checkpoint}",
     ]
 
