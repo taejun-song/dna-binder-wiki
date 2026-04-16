@@ -1,7 +1,9 @@
-"""Step 7: DNA-recognition module identification via sequence conservation."""
+"""Step 7: DNA-recognition module identification via sequence + structural conservation."""
 from __future__ import annotations
+from collections import Counter
 from dataclasses import dataclass, field
 from Bio import AlignIO
+import numpy as np
 import subprocess
 import tempfile
 from pathlib import Path
@@ -69,7 +71,6 @@ def compute_conservation_scores(alignment: list[str]) -> list[float]:
         if not non_gap:
             scores.append(0.0)
             continue
-        from collections import Counter
         counts = Counter(non_gap)
         most_common_count = counts.most_common(1)[0][1]
         scores.append(most_common_count / n_seqs)
@@ -106,7 +107,6 @@ def identify_modules(
             if conservation_scores[col] >= 0.7:
                 non_gap = [seq[col] for seq in alignment if seq[col] != "-"]
                 if non_gap:
-                    from collections import Counter
                     mc = Counter(non_gap).most_common(1)[0]
                     conserved_residues.append(f"{mc[0]}{col + 1}")
 
@@ -145,3 +145,76 @@ def _find_conserved_regions(
     if in_region and len(scores) - start >= min_length:
         regions.append((start, len(scores)))
     return regions
+
+
+@dataclass
+class StructuralModule:
+    module_id: str
+    target_dna: str
+    mean_tm_score: float = 0.0
+    structural_family_size: int = 0
+    members: list[str] = field(default_factory=list)
+    representative: str = ""
+    confidence: str = "low"
+
+
+def identify_structural_modules(
+    candidates: list[CandidateBinder],
+    tm_matrix: np.ndarray,
+    target_dna: str,
+    tm_threshold: float = 0.5,
+    min_cluster_size: int = 3,
+) -> list[StructuralModule]:
+    n = len(candidates)
+    assigned = [False] * n
+    modules: list[StructuralModule] = []
+    mod_counter = 0
+
+    for i in range(n):
+        if assigned[i]:
+            continue
+        cluster_idx = [i]
+        assigned[i] = True
+        for j in range(i + 1, n):
+            if assigned[j]:
+                continue
+            if tm_matrix[i, j] >= tm_threshold:
+                all_above = all(
+                    tm_matrix[k, j] >= tm_threshold * 0.8
+                    for k in cluster_idx
+                )
+                if all_above:
+                    cluster_idx.append(j)
+                    assigned[j] = True
+
+        if len(cluster_idx) < min_cluster_size:
+            continue
+
+        mod_counter += 1
+        member_names = [candidates[idx].shorthand_name for idx in cluster_idx]
+        tm_scores = []
+        for a in range(len(cluster_idx)):
+            for b in range(a + 1, len(cluster_idx)):
+                tm_scores.append(tm_matrix[cluster_idx[a], cluster_idx[b]])
+        mean_tm = float(np.mean(tm_scores)) if tm_scores else 0.0
+
+        best_idx = cluster_idx[0]
+        best_score = 0.0
+        for idx in cluster_idx:
+            avg = float(np.mean([tm_matrix[idx, j] for j in cluster_idx if j != idx])) if len(cluster_idx) > 1 else 1.0
+            if avg > best_score:
+                best_score = avg
+                best_idx = idx
+
+        confidence = "high" if mean_tm > 0.7 else "medium" if mean_tm > 0.5 else "low"
+        modules.append(StructuralModule(
+            module_id=f"{target_dna[:8]}_STMOD{mod_counter:02d}",
+            target_dna=target_dna,
+            mean_tm_score=mean_tm,
+            structural_family_size=len(cluster_idx),
+            members=member_names,
+            representative=candidates[best_idx].shorthand_name,
+            confidence=confidence,
+        ))
+
+    return modules

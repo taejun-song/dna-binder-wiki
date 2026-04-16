@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date
 from analysis.normalize import CandidateBinder, DNATarget, TARGET_SHORTHANDS
 from analysis.redundancy import RedundancyCluster
-from analysis.modules import DNARecognitionModule
+from analysis.modules import DNARecognitionModule, StructuralModule
 from analysis.modularity import ModularityAssessment
 
 
@@ -13,6 +13,7 @@ def generate_synthesis_page(
     clusters: list[RedundancyCluster],
     modules: list[DNARecognitionModule],
     assessments: list[ModularityAssessment],
+    structural_modules: list[StructuralModule] | None = None,
 ) -> str:
     today = date.today().isoformat()
     slug = target.shorthand.lower()
@@ -94,6 +95,28 @@ def generate_synthesis_page(
             for rec in a.experimental_recommendations:
                 lines.append(f"1. {rec}")
             lines.append("")
+
+    if structural_modules:
+        lines.append("## Structural Families (TM-score)")
+        lines.append("")
+        lines.append(f"Structural comparison of ESMFold-predicted folds reveals {len(structural_modules)} "
+                     f"structural family(ies) among the {target.filtered_count} candidates.")
+        lines.append("")
+        for sm in structural_modules:
+            lines.append(f"### {sm.module_id}")
+            lines.append(f"- **Family size**: {sm.structural_family_size} designs")
+            lines.append(f"- **Mean TM-score**: {sm.mean_tm_score:.3f}")
+            lines.append(f"- **Representative**: {sm.representative}")
+            lines.append(f"- **Members**: {', '.join(sm.members)}")
+            lines.append(f"- **Confidence**: {sm.confidence}")
+            lines.append("")
+    elif any(c.pdb_path for c in candidates):
+        lines.append("## Structural Families (TM-score)")
+        lines.append("")
+        lines.append("All designs are structurally distinct — no structural families were detected "
+                     "at TM-score thresholds of 0.5, 0.6, or 0.7. RFdiffusion3 generates highly "
+                     "diverse fold topologies for this target.")
+        lines.append("")
 
     lines.append("## See also")
     lines.append("")

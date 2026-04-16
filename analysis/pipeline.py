@@ -1,13 +1,17 @@
 """Pipeline orchestrator: run full analysis per DNA target."""
 from __future__ import annotations
+import sys
 from pathlib import Path
 from analysis.normalize import (
     load_candidates, deduplicate, CandidateBinder, DNATarget, TARGET_SHORTHANDS,
 )
 from analysis.quality import apply_quality_gate, check_batch_diversity
-from analysis.similarity import compute_sequence_identity_matrix
+from analysis.similarity import compute_sequence_identity_matrix, compute_structural_similarity_matrix
 from analysis.redundancy import cluster_candidates
-from analysis.modules import align_representatives, compute_conservation_scores, identify_modules
+from analysis.modules import (
+    align_representatives, compute_conservation_scores, identify_modules,
+    identify_structural_modules,
+)
 from analysis.modularity import assess_modularity
 from analysis.wiki_output import generate_synthesis_page, generate_log_entry
 
@@ -47,20 +51,26 @@ def _analyze_target(
 ) -> dict:
     target = DNATarget(sequence=target_seq, shorthand=shorthand)
     target.candidate_count = len(candidates)
+    print(f"\n[{shorthand}] Starting analysis of {len(candidates)} candidates...", file=sys.stderr)
 
     unique = deduplicate(candidates)
     target.unique_count = len(unique)
+    print(f"[{shorthand}] After dedup: {len(unique)}", file=sys.stderr)
 
     if not skip_esmfold:
         try:
             from analysis.predict import predict_batch
             struct_dir = output_dir / "structures" / shorthand
+            print(f"[{shorthand}] Running ESMFold predictions to {struct_dir}...", file=sys.stderr)
             unique = predict_batch(unique, struct_dir)
-        except ImportError:
-            pass
+            n_with_pdb = sum(1 for c in unique if c.pdb_path)
+            print(f"[{shorthand}] ESMFold done: {n_with_pdb}/{len(unique)} structures", file=sys.stderr)
+        except Exception as e:
+            print(f"[{shorthand}] ESMFold failed: {e}", file=sys.stderr)
 
     filtered = apply_quality_gate(unique)
     target.filtered_count = len(filtered)
+    print(f"[{shorthand}] After quality gate: {len(filtered)}", file=sys.stderr)
 
     if len(filtered) < 2:
         return {
@@ -68,6 +78,7 @@ def _analyze_target(
             "candidates": filtered,
             "clusters": [],
             "modules": [],
+            "structural_modules": [],
             "assessments": [],
             "wiki_page": None,
             "diversity": check_batch_diversity(filtered),
@@ -87,9 +98,10 @@ def _analyze_target(
                     reps.append(c)
                     break
     target.independent_count = len(reps)
+    print(f"[{shorthand}] Clusters: {len(clusters)}, Independent: {len(reps)}", file=sys.stderr)
 
+    # Sequence-based module identification
     modules = []
-    assessments = []
     if len(reps) >= 2:
         alignment = align_representatives(reps)
         conservation = compute_conservation_scores(alignment)
@@ -97,9 +109,36 @@ def _analyze_target(
             conservation, alignment, reps, target_seq,
             min_length=10, min_conservation=0.4, min_occurrences=min(3, len(reps)),
         )
-        assessments = [assess_modularity(m, filtered) for m in modules]
+    print(f"[{shorthand}] Sequence modules: {len(modules)}", file=sys.stderr)
 
-    wiki_page = generate_synthesis_page(target, filtered, clusters, modules, assessments)
+    # Structural module identification (TM-score based)
+    structural_modules = []
+    has_structures = any(c.pdb_path and Path(c.pdb_path).exists() for c in filtered)
+    if has_structures and len(filtered) >= 3:
+        print(f"[{shorthand}] Computing structural similarity matrix ({len(filtered)}x{len(filtered)})...", file=sys.stderr)
+        tm_matrix = compute_structural_similarity_matrix(filtered)
+        for threshold in [0.7, 0.6, 0.5]:
+            structural_modules = identify_structural_modules(
+                filtered, tm_matrix, target_seq,
+                tm_threshold=threshold, min_cluster_size=3,
+            )
+            if structural_modules:
+                print(f"[{shorthand}] Found {len(structural_modules)} structural families at TM>{threshold}", file=sys.stderr)
+                break
+        if not structural_modules:
+            print(f"[{shorthand}] No structural families found (all designs structurally distinct)", file=sys.stderr)
+    elif has_structures:
+        print(f"[{shorthand}] Too few candidates for structural clustering (<3)", file=sys.stderr)
+    else:
+        print(f"[{shorthand}] No PDB structures available — skipping structural analysis", file=sys.stderr)
+
+    all_modules = modules
+    assessments = [assess_modularity(m, filtered) for m in all_modules]
+
+    wiki_page = generate_synthesis_page(
+        target, filtered, clusters, modules, assessments,
+        structural_modules=structural_modules,
+    )
     page_path = output_dir / "wiki" / f"syntheses/{shorthand.lower()}-binder-analysis.md"
     page_path.parent.mkdir(parents=True, exist_ok=True)
     page_path.write_text(wiki_page)
@@ -111,6 +150,7 @@ def _analyze_target(
         "candidates": filtered,
         "clusters": clusters,
         "modules": modules,
+        "structural_modules": structural_modules,
         "assessments": assessments,
         "wiki_page": str(page_path),
         "diversity": diversity,

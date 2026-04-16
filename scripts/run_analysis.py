@@ -36,8 +36,11 @@ def main():
         print(f"  Modules found: {len(result['modules'])}")
         if result["wiki_page"]:
             print(f"  Wiki page: {result['wiki_page']}")
+        print(f"  Structural families: {len(result.get('structural_modules', []))}")
         for m in result["modules"]:
-            print(f"    Module {m.module_id}: residues {m.residue_range}, conservation={m.conservation_score:.2f}, in {m.occurrences} designs")
+            print(f"    SeqModule {m.module_id}: residues {m.residue_range}, conservation={m.conservation_score:.2f}, in {m.occurrences} designs")
+        for sm in result.get("structural_modules", []):
+            print(f"    StructFamily {sm.module_id}: {sm.structural_family_size} members, TM={sm.mean_tm_score:.3f}, confidence={sm.confidence}")
         for a in result["assessments"]:
             print(f"    Assessment: transferability={a.transferability_score:.2f}, confidence={a.confidence}")
 
