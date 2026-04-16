@@ -2,7 +2,7 @@
 from __future__ import annotations
 from analysis.normalize import CandidateBinder
 
-PLDDT_THRESHOLD = 70.0
+PLDDT_THRESHOLD = 0.70
 MIN_LENGTH = 50
 MAX_LENGTH = 500
 STANDARD_AA = set("ACDEFGHIKLMNPQRSTVWY")
