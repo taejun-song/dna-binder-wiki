@@ -58,15 +58,12 @@ def _analyze_target(
     print(f"[{shorthand}] After dedup: {len(unique)}", file=sys.stderr)
 
     if not skip_esmfold:
-        try:
-            from analysis.predict import predict_batch
-            struct_dir = output_dir / "structures" / shorthand
-            print(f"[{shorthand}] Running ESMFold predictions to {struct_dir}...", file=sys.stderr)
-            unique = predict_batch(unique, struct_dir)
-            n_with_pdb = sum(1 for c in unique if c.pdb_path)
-            print(f"[{shorthand}] ESMFold done: {n_with_pdb}/{len(unique)} structures", file=sys.stderr)
-        except Exception as e:
-            print(f"[{shorthand}] ESMFold failed: {e}", file=sys.stderr)
+        from analysis.predict import predict_batch
+        struct_dir = output_dir / "structures" / shorthand
+        print(f"[{shorthand}] Running ESMFold API predictions to {struct_dir}...", file=sys.stderr)
+        unique = predict_batch(unique, struct_dir)
+        n_with_pdb = sum(1 for c in unique if c.pdb_path)
+        print(f"[{shorthand}] ESMFold done: {n_with_pdb}/{len(unique)} structures", file=sys.stderr)
 
     filtered = apply_quality_gate(unique)
     target.filtered_count = len(filtered)
