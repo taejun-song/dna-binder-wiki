@@ -33,3 +33,12 @@
 - updated: concepts/motif-scaffolding.md (+RFD2 atomic motif detail, AME nuance, +1 source)
 - updated: entities/david-baker.md (+RFD2 paper source, +ligandmpnn mention)
 - index.md: regenerated
+
+## [2026-04-16] ingest | Autoresearch (Karpathy, GitHub, March 2026)
+
+- created: concepts/autonomous-experiment-loop.md
+- created: entities/autoresearch.md
+- created: summaries/autoresearch-karpathy.md
+- created: syntheses/autoresearch-for-binder-design.md
+- updated: entities/rfdiffusion3.md (+autoresearch-for-binder-design link)
+- index.md: regenerated

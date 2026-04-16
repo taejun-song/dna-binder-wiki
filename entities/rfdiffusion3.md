@@ -75,3 +75,4 @@ RFD3 generates structures, not sequences. Sequences are assigned downstream usin
 
 - [[motif-scaffolding]] — a key application enabled by RFD3's atom-level precision
 - [[all-atom-diffusion]] — the generative paradigm RFD3 implements
+- [[autoresearch-for-binder-design]] — autonomous parameter optimization for RFD3 binder design
