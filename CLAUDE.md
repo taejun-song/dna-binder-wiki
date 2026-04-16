@@ -216,3 +216,10 @@ This file is the **domain-agnostic chassis**. To specialise it for a new project
 4. If your domain needs a new page type (e.g., `method`, `dataset`, `experiment`), add it to §3 and create the subdirectory. Prefer extending existing types over adding new ones.
 5. If your domain needs additional required frontmatter fields for a specific type (e.g., `dataset_size` on a `dataset` page), add them to §4 under a "Domain-specific extensions" subsection.
 6. Do **not** delete or weaken §§ 4–9. Those rules are load-bearing for the compounding-artifact property.
+
+## Active Technologies
+- Python 3.11+ + ESMFold (via HuggingFace `esm` or ESM API), BioPython, NumPy, pandas (001-dna-binder-modularity)
+- Files (CSV input, PDB output from ESMFold, markdown wiki pages) (001-dna-binder-modularity)
+
+## Recent Changes
+- 001-dna-binder-modularity: Added Python 3.11+ + ESMFold (via HuggingFace `esm` or ESM API), BioPython, NumPy, pandas

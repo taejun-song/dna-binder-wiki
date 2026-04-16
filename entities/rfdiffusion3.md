@@ -5,6 +5,7 @@ created: 2026-04-16
 updated: 2026-04-16
 sources:
   - "[[rfdiffusion3-paper]]"
+  - "[[rfd3-genome-editing-binders]]"
 tags: [model, diffusion, protein-design, baker-lab]
 aliases: [RFD3]
 ---
@@ -55,6 +56,10 @@ All conditioning types benefit from [[classifier-free-guidance]].
 
 - **DNA-binding protein**: designed against target sequence CGAGAACATAGTCG; 1/5 designs bound with EC50 = 5.89 ± 2.15 μM (yeast surface display).
 - **Cysteine hydrolase**: Cys-His-Asp catalytic triad scaffolded using Ulp-1 crystal structure; 35/190 designs showed multi-turnover activity; best K_cat/K_m = 3557 M⁻¹s⁻¹, exceeding prior RFD2 designs.
+
+## Genome editing binder designs
+
+A dataset of 92 designed DNA-binding proteins targets 9 genomic sequences relevant to genome editing, including PRNP, CAG repeats, human telomere, OCT4, NF-κB, homeodomain, TATA box, and DUX4 loci. Designs include both initial RFD3 outputs and "specblock" re-scaffolded variants. See [[dna-binder-design-targets]] for the full target analysis and [[rfd3-genome-editing-binders]] for the source data.
 
 ## Sequence design
 
