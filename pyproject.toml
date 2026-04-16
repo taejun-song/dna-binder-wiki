@@ -2,7 +2,7 @@
 name = "dna-binder-wiki"
 version = "0.1.0"
 description = "Modular DNA-binding protein discovery and redundancy analysis"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     "biopython",
     "numpy",
@@ -11,9 +11,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-gpu = [
-    "torch",
-    "fair-esm",
+foundry = [
+    "rc-foundry[all]",
 ]
 dev = [
     "pytest",
