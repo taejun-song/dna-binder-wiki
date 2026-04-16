@@ -1,0 +1,29 @@
+[project]
+name = "dna-binder-wiki"
+version = "0.1.0"
+description = "Modular DNA-binding protein discovery and redundancy analysis"
+requires-python = ">=3.11"
+dependencies = [
+    "biopython",
+    "numpy",
+    "pandas",
+]
+
+[project.optional-dependencies]
+gpu = [
+    "torch",
+    "fair-esm",
+]
+dev = [
+    "pytest",
+]
+
+[tool.pytest.ini_options]
+markers = [
+    "gpu: requires GPU and ESMFold model (run on remote server)",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]

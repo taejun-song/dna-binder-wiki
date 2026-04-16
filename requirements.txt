@@ -1,0 +1,9 @@
+torch
+fair-esm
+biopython
+numpy
+pandas
+tmtools
+freesasa
+pytest
+pytest-mark-no-gpu
