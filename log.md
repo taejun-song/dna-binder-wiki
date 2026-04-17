@@ -42,3 +42,8 @@
 - created: syntheses/autoresearch-for-binder-design.md
 - updated: entities/rfdiffusion3.md (+autoresearch-for-binder-design link)
 - index.md: regenerated
+
+## [2026-04-17] query+page | DNA binder generation and evaluation report
+
+- created: syntheses/dna-binder-generation-report.md
+- index.md: regenerated

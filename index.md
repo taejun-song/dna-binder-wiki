@@ -43,6 +43,7 @@ _(none yet)_
 ## Syntheses
 
 - [[autoresearch-for-binder-design|Autoresearch for DNA Binder Design]] — Autonomous RFD3 parameter optimization using ipTM as metric.
+- [[dna-binder-generation-report|DNA Binder Generation and Evaluation Report]] — End-to-end report: 3,400+ designs, 7 passing candidates, comparison with Baker Lab.
 - [[dna-binder-design-targets|DNA Binder Design Targets for Genome Editing]] — Survey of 9 genomic targets for RFD3 DNA binder design.
 
 ## Source Summaries
