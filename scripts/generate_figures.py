@@ -148,17 +148,18 @@ def fig2_score_distribution(baker, overnight, autores):
 
 def fig3_ptm_vs_iptm(baker, overnight, autores):
     fig, ax = plt.subplots(figsize=(9, 7))
-    n_baker, n_overnight, n_autores = 0, 0, 0
+    b_ptm, b_iptm, o_ptm, o_iptm, a_ptm, a_iptm = [], [], [], [], [], []
     for target in TARGETS_ORDER:
         for d in baker.get(target, []):
-            ax.scatter(d["ptm"], d["iptm"], color="#2196F3", alpha=0.5, s=30, edgecolors="none")
-            n_baker += 1
+            b_ptm.append(d["ptm"]); b_iptm.append(d["iptm"])
         for d in overnight.get(target, []):
-            ax.scatter(d["ptm"], d["iptm"], color="#FF9800", alpha=0.3, s=20, edgecolors="none")
-            n_overnight += 1
+            o_ptm.append(d["ptm"]); o_iptm.append(d["iptm"])
         for d in autores.get(target, []):
-            ax.scatter(d["ptm"], d["iptm"], color="#4CAF50", alpha=0.3, s=15, edgecolors="none")
-            n_autores += 1
+            a_ptm.append(d["ptm"]); a_iptm.append(d["iptm"])
+    n_baker, n_overnight, n_autores = len(b_ptm), len(o_ptm), len(a_ptm)
+    ax.scatter(a_ptm, a_iptm, color="#4CAF50", alpha=0.05, s=5, edgecolors="none", rasterized=True)
+    ax.scatter(o_ptm, o_iptm, color="#FF9800", alpha=0.15, s=10, edgecolors="none", rasterized=True)
+    ax.scatter(b_ptm, b_iptm, color="#2196F3", alpha=0.6, s=35, edgecolors="none")
     ax.axhline(y=0.7, color="red", linestyle="--", linewidth=1, alpha=0.5)
     ax.axvline(x=0.8, color="red", linestyle="--", linewidth=1, alpha=0.5)
     ax.fill_between([0.8, 1.0], 0.7, 1.0, alpha=0.08, color="green")
