@@ -80,6 +80,30 @@ Platform: NVIDIA H200 NVL (144GB VRAM), rc-foundry. Duration: 5 days (April 15-1
 
 ![Amino acid composition comparison](figures/fig5_aa_composition.png)
 
+### Figure 6: Top 10 Candidates Per Target — All Methods
+
+![Top 10 per target](figures/fig6_top10_per_target.png)
+
+Horizontal bars show top 10 candidates per target from all methods. Blue = Baker Lab, orange = Overnight, green = AutoRes, purple = Phase4. Labels show ipTM, source, and protein length. NFKB and OCT4pt1 show our candidates dominating the top ranks.
+
+### Figure 7: Protein Length vs ipTM
+
+![Length vs ipTM](figures/fig7_length_vs_iptm.png)
+
+Shorter proteins can achieve comparable or superior ipTM. Baker Lab designs cluster at 125-150 aa; our autoresearch finds optimal lengths from 80 aa (NFKB) to 270 aa (PNRP1), revealing target-specific length preferences.
+
+### Figure 8: Best ipTM Per Target — Method Comparison
+
+![Best per method](figures/fig8_best_per_method.png)
+
+Side-by-side comparison of best ipTM from each method per target. We match or beat Baker Lab on NFKB, OCT4pt1, and CAG. Phase 4 improves HD from 0.733 to 0.743.
+
+### Figure 9: Protein Length Distribution by Source
+
+![Length distribution](figures/fig9_length_distribution.png)
+
+Baker Lab designs have a narrow length range (125-150 aa). Our autoresearch explores a much wider range, discovering that optimal length varies strongly by target.
+
 ## 6. Autoresearch Agent Sessions
 
 ### How Each Agent Worked
@@ -148,7 +172,7 @@ Length=140-180 without CFG was best (0.600). The overnight default-parameter run
 |---------|-------|-----------|---------|------|-----|
 | **NFKB** | 0.753 | 0.645 | **0.798** | **0.798** | **+0.045** |
 | **OCT4pt1** | 0.646 | **0.715** | 0.700 | **0.715** | **+0.069** |
-| **HD** | **0.803** | 0.772 | 0.733 | 0.772 | -0.031 |
+| **HD** | **0.803** | 0.772 | 0.743 | 0.772 | -0.031 |
 | **CAG** | 0.637 | 0.591 | **0.648** | **0.648** | **+0.011** |
 | TATA | -- | 0.611 | **0.684** | **0.684** | -- |
 | Dux4grna2 | -- | 0.568 | **0.641** | **0.641** | -- |
