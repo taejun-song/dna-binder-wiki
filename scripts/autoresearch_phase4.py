@@ -88,7 +88,10 @@ def run_experiment(target_name, config_overrides, sampler_overrides, exp_dir, n_
         if isinstance(v, bool):
             v = str(v).lower()
         cmd.append(f"inference_sampler.{k}={v}")
-    subprocess.run(cmd, stdout=open(exp_dir / "rfd3.log", "w"), stderr=subprocess.STDOUT, timeout=3600)
+    try:
+        subprocess.run(cmd, stdout=open(exp_dir / "rfd3.log", "w"), stderr=subprocess.STDOUT, timeout=3600)
+    except subprocess.TimeoutExpired:
+        log_msg(f"RFD3 timed out for {exp_dir.name}, using partial results")
     cifs = sorted(rfd3_out.rglob("*.cif.gz")) if rfd3_out.exists() else []
     if not cifs:
         return 0.0, 0.0, 0.0, 0
@@ -104,7 +107,10 @@ def run_experiment(target_name, config_overrides, sampler_overrides, exp_dir, n_
     rf3_dir.mkdir(exist_ok=True)
     input_path = rf3_dir / "inputs.json"
     input_path.write_text(json.dumps(rf3_inputs))
-    subprocess.run([str(BIN_DIR / "rf3"), "fold", f"inputs={input_path}", f"out_dir={rf3_dir}/results"], stdout=open(rf3_dir / "rf3.log", "w"), stderr=subprocess.STDOUT, timeout=1800)
+    try:
+        subprocess.run([str(BIN_DIR / "rf3"), "fold", f"inputs={input_path}", f"out_dir={rf3_dir}/results"], stdout=open(rf3_dir / "rf3.log", "w"), stderr=subprocess.STDOUT, timeout=7200)
+    except subprocess.TimeoutExpired:
+        log_msg(f"RF3 timed out for {exp_dir.name}, using partial results")
     scores = []
     for inp in rf3_inputs:
         summaries = list((rf3_dir / "results").rglob(f"*{inp['name']}*summary_confidences*"))
