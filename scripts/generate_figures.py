@@ -70,24 +70,22 @@ def load_scores():
                 overnight[row["target"]].append({"name": row["name"], "ptm": float(row["ptm"]), "iptm": float(row["iptm"]), "source": "Overnight"})
 
     autores = defaultdict(list)
-    for f in Path("analysis_output/autoresearch").glob("*_autoresearch.tsv"):
-        target = f.stem.replace("_autoresearch", "")
-        with open(f) as fh:
+    individual = Path("analysis_output/autoresearch/all_individual_scores.tsv")
+    if individual.exists():
+        with open(individual) as fh:
             reader = csv.DictReader(fh, delimiter="\t")
             for row in reader:
-                n_scored = int(row.get("n_scored", 0))
-                if n_scored > 0:
-                    autores[target].append({"name": row["experiment"], "ptm": float(row["best_ptm"]), "iptm": float(row["best_iptm"]), "source": "AutoRes"})
-    for f in Path("analysis_output/autoresearch").glob("*_results.tsv"):
-        target = f.stem.replace("_results", "")
-        if target in autores:
-            continue
-        with open(f) as fh:
-            reader = csv.DictReader(fh, delimiter="\t")
-            for row in reader:
-                n_scored = int(row.get("n_scored", 0))
-                if n_scored > 0:
-                    autores[target].append({"name": row["experiment"], "ptm": float(row["best_ptm"]), "iptm": float(row["best_iptm"]), "source": "AutoRes"})
+                autores[row["target"]].append({"name": row["design"], "ptm": float(row["ptm"]), "iptm": float(row["iptm"]), "source": "AutoRes"})
+    else:
+        print("WARNING: all_individual_scores.tsv not found, run collect_all_scores.py first")
+        for f in Path("analysis_output/autoresearch").glob("*_results.tsv"):
+            target = f.stem.replace("_results", "").replace("_autoresearch", "")
+            with open(f) as fh:
+                reader = csv.DictReader(fh, delimiter="\t")
+                for row in reader:
+                    n_scored = int(row.get("n_scored", 0))
+                    if n_scored > 0:
+                        autores[target].append({"name": row["experiment"], "ptm": float(row["best_ptm"]), "iptm": float(row["best_iptm"]), "source": "AutoRes"})
 
     return baker, overnight, autores
 
