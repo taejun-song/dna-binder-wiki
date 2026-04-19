@@ -144,17 +144,17 @@ Length=140-180 without CFG was best (0.600). The overnight default-parameter run
 
 ### 7.1 Best ipTM Per Target — All Phases
 
-| Target | Baker Lab | Overnight | AutoRes | Overall Best | Gap vs Baker | Best Source |
-|---------|-----------|-----------|---------|:------------:|:------------:|------------|
-| **NFKB** | 0.753 | 0.645 | **0.798** | **0.798** | **+0.045** | AutoRes exp002 |
-| **OCT4pt1** | 0.646 | **0.715** | 0.700 | **0.715** | **+0.069** | Overnight |
-| **HD** | **0.803** | 0.772 | 0.733 | 0.772 | -0.031 | Overnight |
-| **CAG** | 0.637 | 0.591 | **0.648** | **0.648** | **+0.011** | AutoRes exp018 |
-| TATA | -- | 0.611 | **0.684** | **0.684** | -- | AutoRes exp006 |
-| Dux4grna2 | -- | 0.568 | **0.641** | **0.641** | -- | AutoRes exp039 |
-| PNRP1 | **0.701** | 0.607 | 0.662 | 0.662 | -0.038 | AutoRes exp036 |
-| OCT4pt2 | **0.685** | **0.657** | 0.634 | 0.657 | -0.028 | Overnight |
-| HSTELO | **0.654** | **0.639** | 0.600 | 0.639 | -0.015 | Overnight |
+| Target | Baker | Overnight | AutoRes | Best | Gap |
+|---------|-------|-----------|---------|------|-----|
+| **NFKB** | 0.753 | 0.645 | **0.798** | **0.798** | **+0.045** |
+| **OCT4pt1** | 0.646 | **0.715** | 0.700 | **0.715** | **+0.069** |
+| **HD** | **0.803** | 0.772 | 0.733 | 0.772 | -0.031 |
+| **CAG** | 0.637 | 0.591 | **0.648** | **0.648** | **+0.011** |
+| TATA | -- | 0.611 | **0.684** | **0.684** | -- |
+| Dux4grna2 | -- | 0.568 | **0.641** | **0.641** | -- |
+| PNRP1 | **0.701** | 0.607 | 0.662 | 0.662 | -0.038 |
+| OCT4pt2 | **0.685** | **0.657** | 0.634 | 0.657 | -0.028 |
+| HSTELO | **0.654** | **0.639** | 0.600 | 0.639 | -0.015 |
 
 **We beat or match Baker Lab on 3 of 7 compared targets** (NFKB, OCT4pt1, CAG).
 
@@ -162,18 +162,18 @@ Note: For HD, OCT4pt2, and HSTELO, overnight generation with default parameters 
 
 ### 7.2 Candidates Passing Threshold (pTM >= 0.8, ipTM >= 0.7)
 
-| No. | Target | Design | pTM | ipTM | Len | Source |
-|-----|--------|--------|-----|------|-----|--------|
-| 1 | NFKB | config_design_3_model_3 | 0.724 | **0.798** | 98 | **Ours (AutoRes)** |
-| 2 | HD | specblock_design82 | 0.895 | **0.803** | 142 | Baker Lab |
-| 3 | HD | specblock_design94 | 0.852 | **0.790** | 150 | Baker Lab |
-| 4 | HD | HD_config_HD_19_model_3 | 0.675 | **0.772** | 131 | **Ours (Overnight)** |
-| 5 | NFKB | specblock_design66 | 0.862 | **0.753** | 137 | Baker Lab |
-| 6 | NFKB | specblock_design82 | 0.880 | **0.753** | 126 | Baker Lab |
-| 7 | NFKB | specblock_design65 | 0.867 | **0.718** | 137 | Baker Lab |
-| 8 | OCT4pt1 | OCT4pt1_18_model_0 | 0.840 | **0.715** | 125 | **Ours (Overnight)** |
-| 9 | PNRP1 | specblock_design39 | 0.899 | **0.701** | 143 | Baker Lab |
-| 10 | OCT4pt1 | config_design_6_model_0 | 0.908 | **0.700** | 155 | **Ours (AutoRes)** |
+| Target | pTM | ipTM | Len | Source |
+|--------|-----|------|-----|--------|
+| NFKB | 0.724 | **0.798** | 98 | Ours AutoRes |
+| HD | 0.895 | **0.803** | 142 | Baker Lab |
+| HD | 0.852 | **0.790** | 150 | Baker Lab |
+| HD | 0.675 | **0.772** | 131 | Ours Overnight |
+| NFKB | 0.862 | **0.753** | 137 | Baker Lab |
+| NFKB | 0.880 | **0.753** | 126 | Baker Lab |
+| NFKB | 0.867 | **0.718** | 137 | Baker Lab |
+| OCT4pt1 | 0.840 | **0.715** | 125 | Ours Overnight |
+| PNRP1 | 0.899 | **0.701** | 143 | Baker Lab |
+| OCT4pt1 | 0.908 | **0.700** | 155 | Ours AutoRes |
 
 **10 candidates pass ipTM >= 0.7.** 6 from Baker Lab, 4 from ours (2 overnight, 2 autoresearch). Note: our NFKB and HD overnight candidates have ipTM >= 0.7 but pTM < 0.8 — they pass the interface threshold but not the fold threshold.
 
