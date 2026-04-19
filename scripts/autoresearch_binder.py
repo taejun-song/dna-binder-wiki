@@ -176,7 +176,7 @@ def run_autoresearch(target_name, base_dir, n_designs=10):
     log_msg(f"[{target_name}] {exp_id}: ipTM={iptm:.4f} mean={mean:.4f} pTM={ptm:.4f} -> {status}")
 
     # Phase 2: Length sweep
-    for length in ["50-80", "60-90", "70-100", "80-120", "100-140", "140-180", "160-200", "100-120", "130-150"]:
+    for length in ["80-120", "100-140", "140-180", "160-200", "100-120", "130-150"]:
         exp_count += 1
         exp_id = f"exp{exp_count:03d}"
         change = f"length={length}"

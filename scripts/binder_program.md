@@ -52,8 +52,9 @@ Each experiment:
 
 ## Parameter exploration strategy
 
-### Phase 1: Protein length sweep
-Try lengths: 50-80, 60-90, 70-100, 80-120, 100-140, 120-160, 140-180, 160-200
+### Phase 1: Protein length sweep (start short)
+Try lengths in this order: 50-70, 60-80, 70-90, 80-100, 80-120, 100-140, 120-160, 140-180
+Start from the shortest lengths first. NFKB's best result (ipTM=0.798) came from 80-120 aa — shorter than Baker Lab's 126-150 range.
 
 ### Phase 2: Classifier-free guidance
 Enable CFG, sweep cfg_scale: 1.0, 1.5, 2.0, 2.5, 3.0
@@ -73,9 +74,11 @@ Enable CFG, sweep cfg_scale: 1.0, 1.5, 2.0, 2.5, 3.0
 ### Phase 5: Combined best parameters
 Combine the best settings from phases 1-4
 
-## Simplicity criterion
+## Design principles
 
-All else being equal, simpler is better. A small ipTM improvement from complex conditioning is less valuable than a comparable improvement from a simple parameter change.
+1. **Shorter is better.** If two designs have comparable ipTM (within 0.02), prefer the shorter protein. Compact binders are easier to synthesize, more likely to fold correctly, and NFKB's best (98 aa) proves short designs can outperform Baker Lab. Always explore lengths down to 50 aa before moving to longer ranges.
+
+2. **Simpler is better.** A small ipTM improvement from complex conditioning is less valuable than a comparable improvement from a simple parameter change.
 
 ## Results format
 
