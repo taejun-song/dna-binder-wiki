@@ -47,3 +47,9 @@
 
 - created: syntheses/dna-binder-generation-report.md
 - index.md: regenerated
+
+## [2026-04-19] correction | Updated report with autoresearch results (402 experiments, 24,400 scored)
+
+- updated: syntheses/dna-binder-generation-report.md (added autoresearch agent session logs, final comparison table, production stats)
+- updated: dna-binder-generation-report-print.md (complete rewrite with autoresearch sections)
+- index.md: regenerated

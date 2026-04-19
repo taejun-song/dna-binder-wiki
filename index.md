@@ -1,9 +1,10 @@
 # Wiki Index
 
-_Last regenerated: 2026-04-16_
+_Last regenerated: 2026-04-19_
 
 ## Recently Updated
 
+- [[dna-binder-generation-report|DNA Binder Generation and Evaluation Report]] — 24,400 scored complexes, 402 autoresearch experiments, beating Baker Lab on 3/7 targets.
 - [[autoresearch-for-binder-design|Autoresearch for DNA Binder Design]] — Applying autonomous experiment loops to RFD3 parameter optimization with ipTM as metric.
 - [[autoresearch|Autoresearch]] — Karpathy's framework for autonomous AI agent-driven ML experimentation.
 - [[autonomous-experiment-loop|Autonomous Experiment Loop]] — Agent-driven iterative experiment → evaluate → keep/revert methodology.
@@ -13,7 +14,6 @@ _Last regenerated: 2026-04-16_
 - [[dna-binder-design-targets|DNA Binder Design Targets for Genome Editing]] — Survey of 9 genomic targets for RFD3 DNA binder design.
 - [[theozyme|Theozyme]] — Idealized active-site geometry used as input for enzyme design.
 - [[atomic-motif-conditioning|Atomic Motif Conditioning]] — The three motif representation modes in RFD2.
-- [[rosettafold-all-atom|RoseTTAFold All-Atom]] — Structure prediction model; base architecture for RFD2.
 
 ## Concepts
 
