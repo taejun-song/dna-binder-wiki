@@ -88,7 +88,7 @@ def run_experiment(target_name, config_overrides, sampler_overrides, exp_dir, n_
         if isinstance(v, bool):
             v = str(v).lower()
         cmd.append(f"inference_sampler.{k}={v}")
-    subprocess.run(cmd, stdout=open(exp_dir / "rfd3.log", "w"), stderr=subprocess.STDOUT, timeout=900)
+    subprocess.run(cmd, stdout=open(exp_dir / "rfd3.log", "w"), stderr=subprocess.STDOUT, timeout=3600)
     cifs = sorted(rfd3_out.rglob("*.cif.gz")) if rfd3_out.exists() else []
     if not cifs:
         return 0.0, 0.0, 0.0, 0
