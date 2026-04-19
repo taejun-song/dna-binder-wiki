@@ -53,7 +53,7 @@ Each experiment:
 ## Parameter exploration strategy
 
 ### Phase 1: Protein length sweep
-Try lengths: 80-120, 100-140, 120-160, 140-180, 160-200
+Try lengths: 50-80, 60-90, 70-100, 80-120, 100-140, 120-160, 140-180, 160-200
 
 ### Phase 2: Classifier-free guidance
 Enable CFG, sweep cfg_scale: 1.0, 1.5, 2.0, 2.5, 3.0

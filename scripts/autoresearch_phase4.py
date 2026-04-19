@@ -170,6 +170,10 @@ def run_phase4(target_name, base_dir, n_designs=20):
 
     log_msg(f"[{target_name}] Phase 4 start. Previous best: {best_ever:.4f}")
 
+    # Short-length exploration (NFKB breakthrough was at 80-120)
+    for lo, hi in [(50, 80), (60, 90), (70, 100), (80, 110)]:
+        try_exp(f"length={lo}-{hi}", config_override={"length": f"{lo}-{hi}"})
+
     # Fine-grained length around previous optimum
     prev_len = best_config.get("length", "120-140")
     parts = prev_len.split("-")
