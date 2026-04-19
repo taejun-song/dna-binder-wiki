@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""Generate target-specific DNA PDB files by mutating 1BNA.
+"""Generate target-specific DNA PDB files by stripping 1BNA to backbone-only.
 
-Takes the real 1BNA.pdb crystal structure and replaces the DNA sequence
-while keeping all backbone atoms and geometry intact. This preserves
-perfect PDB formatting that RFD3 can parse.
+RFD3 reads the full atomic structure from the input PDB. Since we can't easily
+swap purine/pyrimidine bases without breaking atom counts, we instead:
+1. Keep only backbone atoms (P, OP1, OP2, O5', C5', C4', O4', C3', O3', C2', C1')
+   which are identical across all nucleotides
+2. Rename residues to match the target sequence
+3. RFD3 uses the backbone geometry to condition protein generation;
+   the base identity comes from the contig specification
 
-For sequences shorter than 12bp, we trim residues from the ends.
-For sequences exactly 12bp, we do a direct substitution.
+For targets with <12bp, we trim residues from the ends.
 
 Output: data/dna_templates/{TARGET}.pdb
 """
@@ -20,58 +23,61 @@ TARGETS = {
 }
 COMPLEMENT = {"A": "T", "T": "A", "G": "C", "C": "G"}
 BASE_TO_RES = {"A": " DA", "T": " DT", "G": " DG", "C": " DC"}
+DNA_RESNAMES = {" DA", " DT", " DG", " DC"}
+BACKBONE_ATOMS = {
+    "P", "OP1", "OP2", "O5'", "C5'", "C4'", "O4'", "C3'", "O3'", "C2'", "C1'",
+}
 
 
-def mutate_1bna(template_path, target_name, seq, out_path):
-    """Mutate 1BNA residue names to match target sequence."""
+def make_target_pdb(template_path, target_name, seq, out_path):
     comp_seq = "".join(COMPLEMENT[b] for b in reversed(seq))
     n = len(seq)
     with open(template_path) as f:
         lines = f.readlines()
-    dna_resnames = {" DA", " DT", " DG", " DC"}
-    chain_a_residues = set()
-    chain_b_residues = set()
-    for line in lines:
-        if line.startswith(("ATOM", "HETATM")) and len(line) >= 26:
-            chain = line[21]
-            resnum = int(line[22:26].strip())
-            resname = line[17:20]
-            if resname not in dna_resnames:
-                continue
-            if chain == "A":
-                chain_a_residues.add(resnum)
-            elif chain == "B":
-                chain_b_residues.add(resnum)
-    a_resnums = sorted(chain_a_residues)
-    b_resnums = sorted(chain_b_residues)
-    a_keep = set(a_resnums[:n])
-    b_keep = set(b_resnums[:n])
-    a_map = {a_resnums[i]: seq[i] for i in range(min(n, len(a_resnums)))}
-    b_map = {b_resnums[i]: comp_seq[i] for i in range(min(n, len(b_resnums)))}
+
+    chain_a_resnums = sorted({
+        int(line[22:26].strip())
+        for line in lines
+        if line.startswith("ATOM") and len(line) >= 26 and line[21] == "A" and line[17:20] in DNA_RESNAMES
+    })
+    chain_b_resnums = sorted({
+        int(line[22:26].strip())
+        for line in lines
+        if line.startswith("ATOM") and len(line) >= 26 and line[21] == "B" and line[17:20] in DNA_RESNAMES
+    })
+
+    a_keep = set(chain_a_resnums[:n])
+    b_keep = set(chain_b_resnums[:n])
+    a_map = {chain_a_resnums[i]: seq[i] for i in range(min(n, len(chain_a_resnums)))}
+    b_map = {chain_b_resnums[i]: comp_seq[i] for i in range(min(n, len(chain_b_resnums)))}
 
     out_lines = []
     out_lines.append(f"REMARK   Target: {target_name}  Sequence: {seq}\n")
-    out_lines.append(f"REMARK   Mutated from 1BNA template\n")
+    out_lines.append(f"REMARK   Backbone from 1BNA, residues renamed for target\n")
     for line in lines:
-        if line.startswith(("ATOM", "HETATM")) and len(line) >= 26:
-            chain = line[21]
-            resnum = int(line[22:26].strip())
-            resname = line[17:20]
-            if resname not in dna_resnames:
-                continue
-            if chain == "A" and resnum in a_keep and resnum in a_map:
-                new_res = BASE_TO_RES[a_map[resnum]]
-                line = line[:17] + new_res + line[20:]
+        if not line.startswith("ATOM") or len(line) < 26:
+            if line.startswith(("TER", "END")):
                 out_lines.append(line)
-            elif chain == "B" and resnum in b_keep and resnum in b_map:
-                new_res = BASE_TO_RES[b_map[resnum]]
-                line = line[:17] + new_res + line[20:]
-                out_lines.append(line)
-        elif line.startswith("TER"):
+            continue
+        chain = line[21]
+        resname = line[17:20]
+        if resname not in DNA_RESNAMES:
+            continue
+        resnum = int(line[22:26].strip())
+        atom_name = line[12:16].strip()
+        if atom_name not in BACKBONE_ATOMS:
+            continue
+        if chain == "A" and resnum in a_keep and resnum in a_map:
+            new_res = BASE_TO_RES[a_map[resnum]]
+            line = line[:17] + new_res + line[20:]
             out_lines.append(line)
-        elif line.startswith("END"):
+        elif chain == "B" and resnum in b_keep and resnum in b_map:
+            new_res = BASE_TO_RES[b_map[resnum]]
+            line = line[:17] + new_res + line[20:]
             out_lines.append(line)
 
+    if not out_lines[-1].startswith("END"):
+        out_lines.append("END\n")
     Path(out_path).write_text("".join(out_lines))
     return n
 
@@ -86,7 +92,7 @@ def main():
     for name in targets:
         seq = TARGETS[name]
         out_path = out_dir / f"{name}.pdb"
-        n = mutate_1bna(template, name, seq, out_path)
+        n = make_target_pdb(template, name, seq, out_path)
         print(f"{name}: {seq} ({n}bp) -> {out_path}")
 
 
