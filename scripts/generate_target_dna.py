@@ -28,12 +28,16 @@ def mutate_1bna(template_path, target_name, seq, out_path):
     n = len(seq)
     with open(template_path) as f:
         lines = f.readlines()
+    dna_resnames = {" DA", " DT", " DG", " DC"}
     chain_a_residues = set()
     chain_b_residues = set()
     for line in lines:
         if line.startswith(("ATOM", "HETATM")) and len(line) >= 26:
             chain = line[21]
             resnum = int(line[22:26].strip())
+            resname = line[17:20]
+            if resname not in dna_resnames:
+                continue
             if chain == "A":
                 chain_a_residues.add(resnum)
             elif chain == "B":
@@ -52,6 +56,9 @@ def mutate_1bna(template_path, target_name, seq, out_path):
         if line.startswith(("ATOM", "HETATM")) and len(line) >= 26:
             chain = line[21]
             resnum = int(line[22:26].strip())
+            resname = line[17:20]
+            if resname not in dna_resnames:
+                continue
             if chain == "A" and resnum in a_keep and resnum in a_map:
                 new_res = BASE_TO_RES[a_map[resnum]]
                 line = line[:17] + new_res + line[20:]
@@ -60,9 +67,9 @@ def mutate_1bna(template_path, target_name, seq, out_path):
                 new_res = BASE_TO_RES[b_map[resnum]]
                 line = line[:17] + new_res + line[20:]
                 out_lines.append(line)
-            elif chain not in ("A", "B"):
-                out_lines.append(line)
-        elif line.startswith(("TER", "END", "REMARK", "HEADER", "CRYST")):
+        elif line.startswith("TER"):
+            out_lines.append(line)
+        elif line.startswith("END"):
             out_lines.append(line)
 
     Path(out_path).write_text("".join(out_lines))
