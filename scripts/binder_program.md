@@ -93,32 +93,34 @@ Each experiment:
 
 ## Parameter exploration strategy
 
-### Phase 1: Protein length sweep (start short)
-Try lengths in this order: 50-70, 60-80, 70-90, 80-100, 80-120, 100-140, 120-160, 140-180
-Start from the shortest lengths first. NFKB's best result (ipTM=0.798) came from 80-120 aa — shorter than Baker Lab's 126-150 range.
-For TP53: try 15-25, 18-28, 20-30, 25-35 — goal is <31 aa.
+### Optuna-guided optimization (preferred)
 
-### Phase 2: Classifier-free guidance
-Enable CFG, sweep cfg_scale: 1.0, 1.5, 2.0, 2.5, 3.0
+Use the Optuna suggestion script to choose parameters. It uses Bayesian optimization (TPE) to model which parameter combinations produce high ipTM, and suggests the most promising next experiment.
 
-### Phase 3: Diffusion dynamics
-- step_scale: 1.0, 1.25, 1.5, 1.75, 2.0
-- noise_scale: 0.8, 0.9, 1.0, 1.1
-- gamma_0: 0.0, 0.3, 0.6, 0.9
-- num_timesteps: 100, 200, 300
+```bash
+# Get next suggested params for DNA target:
+.venv/bin/python scripts/optuna_suggest.py --target TARGET --results analysis_output/autoresearch/TARGET_agent2.tsv
 
-### Phase 4: Orientation and conditioning
-- ori_token variations: shift center-of-mass along DNA axis
-- is_non_loopy: true vs false
-- infer_ori_strategy: "com" vs "hotspots"
-- H-bond conditioning on DNA bases
-- For TP53: `select_hotspots` on L344, L348, A347, L350
+# For TP53:
+.venv/bin/python scripts/optuna_suggest.py --target TP53_tet --results analysis_output/tp53/tp53_results.tsv --tp53
+```
 
-### Phase 5: Combined best parameters
-Combine the best settings from phases 1-4
+The script outputs JSON with suggested `length`, `sampler_overrides`, and optionally `infer_ori_strategy`. Use these for your next experiment. After scoring, log the result to the TSV, then call the script again for the next suggestion.
 
-### Phase 6: ProteinMPNN refinement
-Take top 10 designs from Phase 5, run ProteinMPNN with 8 sequences each, re-score all with RF3. This often improves ipTM by 0.02-0.05.
+**Why Optuna beats grid search**: it learns from previous experiments to suggest parameter combinations (not one axis at a time). After ~10 trials it focuses on the most promising regions of parameter space.
+
+### Fallback: manual exploration (if Optuna is unavailable)
+
+Phase 1: Length sweep (start short) — 50-70, 60-80, 70-90, 80-100, 80-120, 100-140, 120-160, 140-180
+Phase 2: CFG — cfg_scale: 1.0, 1.5, 2.0, 2.5, 3.0
+Phase 3: Dynamics — step_scale, noise_scale, gamma_0, num_timesteps
+Phase 4: Orientation — infer_ori_strategy: "com" vs "hotspots", is_non_loopy
+Phase 5: Combined best parameters
+For TP53: lengths 12-30, select_hotspots on L344, L348, A347, L350
+
+### ProteinMPNN refinement (always do this)
+
+After every experiment, run ProteinMPNN on the top backbone to get redesigned sequences. Score both the RFD3 sequence and ProteinMPNN sequences with RF3 — keep the best. This often improves ipTM by 0.02-0.05.
 
 ## Design principles
 
